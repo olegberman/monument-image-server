@@ -40,6 +40,8 @@ var upload = multer({
 
 // Views in public directory
 app.use(express.static('static'));
+app.use('/uploads', express.static('uploads'));
+
 
 
 app.post('/upload', upload.single('image'), function (req, res) {
