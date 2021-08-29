@@ -49,24 +49,23 @@ app.post('/upload', upload.single('image'), function (req, res) {
       error_description: 'File was not uploaded'
     })
   }
-  const ext = file.originalname.split('.')[file.originalname.split('.').length - 1];
-  const newFilePath =
-    exec(`backgroundremover -i "${req.file}" -o "./uploads/${uuidv4()}.${ext}"`, (err, stdout, stderr) => {
-      if (err) {
-        return res.json({
-          error: true,
-          error_description: 'Could not remove bg!',
-          error_trace: err
-        })
-      }
+  const ext = req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
+  exec(`backgroundremover -i "${req.file}" -o "./uploads/${uuidv4()}.${ext}"`, (err, stdout, stderr) => {
+    if (err) {
       return res.json({
-        success: true,
-        images: {
-          original: req.file.path,
-          formatted: `./uploads/${uuidv4()}.${ext}`
-        }
+        error: true,
+        error_description: 'Could not remove bg!',
+        error_trace: err
       })
+    }
+    return res.json({
+      success: true,
+      images: {
+        original: req.file.path,
+        formatted: `./uploads/${uuidv4()}.${ext}`
+      }
     })
+  })
 });
 
 app.listen(SERVER_PORT, () => {
