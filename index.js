@@ -50,7 +50,7 @@ app.post('/upload', upload.single('image'), function (req, res) {
     })
   }
   const ext = req.file.originalname.split('.')[req.file.originalname.split('.').length - 1];
-  exec(`backgroundremover -i "${req.file}" -o "./uploads/${uuidv4()}.${ext}"`, (err, stdout, stderr) => {
+  exec(`backgroundremover -i "${req.file.path}" -o "./uploads/${uuidv4()}.${ext}"`, (err, stdout, stderr) => {
     if (err) {
       return res.json({
         error: true,
