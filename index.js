@@ -3,7 +3,8 @@ const express = require('express')
 const multer = require('multer')
 const { v4: uuidv4 } = require('uuid')
 const path = require('path')
-const { exec } = require('child_process');
+const cors = require('cors')
+const { exec } = require('child_process')
 const SERVER_PORT = 8888
 const S3_ENDPONT = 'nyc3.digitaloceanspaces.com'
 
@@ -38,7 +39,7 @@ var upload = multer({
   }
 })
 
-// Views in public directory
+app.use(cors())
 app.use(express.static('static'));
 app.use('/uploads', express.static('uploads'));
 
