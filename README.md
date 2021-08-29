@@ -24,3 +24,5 @@ We're using https://github.com/nadermx/backgroundremover to remove backgrounds
 ## Generate key
 
 `ssh-keygen`
+
+Add new public key to authorized_keys
