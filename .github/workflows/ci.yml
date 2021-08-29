@@ -1,0 +1,59 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [release]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout to release branch
+        uses: actions/checkout@v2
+        with:
+          ref: release
+        
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14.17.1'
+
+      - name: Install Dependencies
+        run: npm install
+        
+      - name: Stop app on the server and delete old artifact
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.SSHKEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            pm2 stop backend
+            pm2 delete backend
+            cd /var/app
+            rm -rf ./backend
+        
+      - name: Copy artifact to remote
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+        with:
+          source: "."
+          target: "/var/app/backend"
+
+      - name: Install dependencies and start app
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.SSHKEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/app/backend
+            npm install
+            pm2 start index.js --name backend
